@@ -64,13 +64,23 @@ The server loads all available adapters from the `desktop_mcp/adapters/` directo
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Claude AI     │◄──►│   MCP Client    │◄──►│  Desktop MCP    │
+│   Claude AI     │◄──►│   MCP Client    │◄──►│    NPM MCP      │
 │                 │    │                 │    │     Server      │
-│ • Natural       │    │ • Protocol      │    │ • OS APIs       │
-│   Language      │    │   Handler       │    │ • Automation    │
-│ • Reasoning     │    │ • Connection    │    │ • Safety        │
-│ • Planning      │    │   Management    │    │ • Execution     │
+│ • Natural       │    │ • Protocol      │    │ • Auto-Discovery│
+│   Language      │    │   Handler       │    │ • JSON Adapters │
+│ • Reasoning     │    │ • Connection    │    │ • Package Bridge│
+│ • Planning      │    │   Management    │    │ • Cross-Platform│
 └─────────────────┘    └─────────────────┘    └─────────────────┘
+                                                        │
+                                               ┌─────────────────┐
+                                               │  NPM & Python   │
+                                               │    Packages     │
+                                               │                 │
+                                               │ • robotjs       │
+                                               │ • puppeteer     │
+                                               │ • pyautogui     │
+                                               │ • requests      │
+                                               └─────────────────┘
 ```
 
 ## Available Tools
