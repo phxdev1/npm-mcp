@@ -1,0 +1,98 @@
+{
+  "package": "pyperclip",
+  "import_type": "python", 
+  "description": "Clipboard operations for text and data transfer",
+  "capabilities": ["clipboard"],
+  "setup": [
+    "import pyperclip"
+  ],
+  "methods": {
+    "get_clipboard_text": {
+      "description": "Get text content from clipboard",
+      "parameters": [],
+      "code": [
+        "try:",
+        "    text = pyperclip.paste()",
+        "    result = {",
+        "        'success': True,",
+        "        'text': text,",
+        "        'length': len(text)",
+        "    }",
+        "except Exception as e:",
+        "    result = {'success': False, 'error': str(e)}",
+        "return result"
+      ]
+    },
+    "set_clipboard_text": {
+      "description": "Set text content to clipboard",
+      "parameters": ["text"],
+      "code": [
+        "text = params.get('text', '')",
+        "try:",
+        "    pyperclip.copy(text)",
+        "    result = {",
+        "        'success': True,",
+        "        'text': text,",
+        "        'length': len(text)",
+        "        'message': 'Text copied to clipboard'",
+        "    }",
+        "except Exception as e:",
+        "    result = {'success': False, 'error': str(e)}",
+        "return result"
+      ]
+    },
+    "clear_clipboard": {
+      "description": "Clear clipboard content",
+      "parameters": [],
+      "code": [
+        "try:",
+        "    pyperclip.copy('')",
+        "    result = {'success': True, 'message': 'Clipboard cleared'}",
+        "except Exception as e:",
+        "    result = {'success': False, 'error': str(e)}",
+        "return result"
+      ]
+    },
+    "clipboard_has_text": {
+      "description": "Check if clipboard contains text",
+      "parameters": [],
+      "code": [
+        "try:",
+        "    text = pyperclip.paste()",
+        "    has_text = bool(text and text.strip())",
+        "    result = {",
+        "        'has_text': has_text,",
+        "        'length': len(text) if text else 0,",
+        "        'preview': text[:100] + '...' if text and len(text) > 100 else text",
+        "    }",
+        "except Exception as e:",
+        "    result = {'success': False, 'error': str(e)}",
+        "return result"
+      ]
+    },
+    "append_to_clipboard": {
+      "description": "Append text to existing clipboard content",
+      "parameters": ["text", "separator?=\\n"],
+      "code": [
+        "new_text = params.get('text', '')",
+        "separator = params.get('separator', '\\n')",
+        "try:",
+        "    current = pyperclip.paste()",
+        "    if current:",
+        "        combined = current + separator + new_text",
+        "    else:",
+        "        combined = new_text",
+        "    pyperclip.copy(combined)",
+        "    result = {",
+        "        'success': True,",
+        "        'appended_text': new_text,",
+        "        'total_length': len(combined),",
+        "        'message': 'Text appended to clipboard'",
+        "    }",
+        "except Exception as e:",
+        "    result = {'success': False, 'error': str(e)}",
+        "return result"
+      ]
+    }
+  }
+}

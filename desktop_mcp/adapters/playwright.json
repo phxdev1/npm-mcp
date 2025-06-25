@@ -1,0 +1,354 @@
+{
+  "package": "playwright",
+  "import_name": "playwright",
+  "description": "Modern browser automation with Playwright",
+  "capabilities": ["web_automation"],
+  "setup": [
+    "const { chromium, firefox, webkit } = require('playwright');",
+    "global.browsers = new Map();",
+    "global.pages = new Map();"
+  ],
+  "cleanup": [
+    "for (const browser of global.browsers.values()) {",
+    "  await browser.close();",
+    "}"
+  ],
+  "methods": {
+    "launch_browser": {
+      "description": "Launch a browser instance",
+      "parameters": ["browser_type?=chromium", "headless?=false", "browser_id?=default"],
+      "code": [
+        "const {browser_type = 'chromium', headless = false, browser_id = 'default'} = params;",
+        "let browserLauncher;",
+        "switch(browser_type) {",
+        "  case 'firefox': browserLauncher = firefox; break;",
+        "  case 'webkit': browserLauncher = webkit; break;",
+        "  default: browserLauncher = chromium;",
+        "}",
+        "const browser = await browserLauncher.launch({ headless });",
+        "global.browsers.set(browser_id, browser);",
+        "return {success: true, browser_type, browser_id, headless};"
+      ]
+    },
+    "new_page": {
+      "description": "Create a new page/tab",
+      "parameters": ["page_id?=main", "browser_id?=default", "viewport?"],
+      "code": [
+        "const {page_id = 'main', browser_id = 'default', viewport} = params;",
+        "const browser = global.browsers.get(browser_id);",
+        "if (!browser) {",
+        "  return {success: false, error: `Browser ${browser_id} not found`};",
+        "}",
+        "const context = await browser.newContext();",
+        "const page = await context.newPage();",
+        "if (viewport) {",
+        "  await page.setViewportSize(viewport);",
+        "}",
+        "global.pages.set(page_id, page);",
+        "return {success: true, page_id, browser_id};"
+      ]
+    },
+    "navigate_to": {
+      "description": "Navigate to a URL",
+      "parameters": ["url", "page_id?=main", "wait_until?=networkidle"],
+      "code": [
+        "const {url, page_id = 'main', wait_until = 'networkidle'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "await page.goto(url, { waitUntil: wait_until });",
+        "const title = await page.title();",
+        "return {success: true, url, title, page_id};"
+      ]
+    },
+    "click_element": {
+      "description": "Click an element by selector",
+      "parameters": ["selector", "page_id?=main", "timeout?=30000"],
+      "code": [
+        "const {selector, page_id = 'main', timeout = 30000} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "await page.waitForSelector(selector, { timeout });",
+        "await page.click(selector);",
+        "return {success: true, selector, page_id};"
+      ]
+    },
+    "double_click_element": {
+      "description": "Double click an element",
+      "parameters": ["selector", "page_id?=main", "timeout?=30000"],
+      "code": [
+        "const {selector, page_id = 'main', timeout = 30000} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "await page.waitForSelector(selector, { timeout });",
+        "await page.dblclick(selector);",
+        "return {success: true, selector, page_id};"
+      ]
+    },
+    "type_in_element": {
+      "description": "Type text in an element",
+      "parameters": ["selector", "text", "page_id?=main", "clear?=true", "delay?=0"],
+      "code": [
+        "const {selector, text, page_id = 'main', clear = true, delay = 0} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "await page.waitForSelector(selector);",
+        "if (clear) {",
+        "  await page.fill(selector, '');",
+        "}",
+        "await page.type(selector, text, { delay });",
+        "return {success: true, selector, text, page_id};"
+      ]
+    },
+    "fill_element": {
+      "description": "Fill an element (faster than typing)",
+      "parameters": ["selector", "value", "page_id?=main"],
+      "code": [
+        "const {selector, value, page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "await page.waitForSelector(selector);",
+        "await page.fill(selector, value);",
+        "return {success: true, selector, value, page_id};"
+      ]
+    },
+    "get_element_text": {
+      "description": "Get text content of an element",
+      "parameters": ["selector", "page_id?=main"],
+      "code": [
+        "const {selector, page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "const text = await page.textContent(selector);",
+        "return {selector, text, page_id};"
+      ]
+    },
+    "get_element_attribute": {
+      "description": "Get an element's attribute value",
+      "parameters": ["selector", "attribute", "page_id?=main"],
+      "code": [
+        "const {selector, attribute, page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "const value = await page.getAttribute(selector, attribute);",
+        "return {selector, attribute, value, page_id};"
+      ]
+    },
+    "wait_for_element": {
+      "description": "Wait for an element to appear",
+      "parameters": ["selector", "timeout?=30000", "page_id?=main"],
+      "code": [
+        "const {selector, timeout = 30000, page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "try {",
+        "  await page.waitForSelector(selector, { timeout });",
+        "  return {success: true, selector, page_id};",
+        "} catch (error) {",
+        "  return {success: false, selector, error: 'timeout', page_id};",
+        "}"
+      ]
+    },
+    "wait_for_navigation": {
+      "description": "Wait for page navigation to complete",
+      "parameters": ["page_id?=main", "timeout?=30000", "wait_until?=networkidle"],
+      "code": [
+        "const {page_id = 'main', timeout = 30000, wait_until = 'networkidle'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "await page.waitForLoadState(wait_until, { timeout });",
+        "return {success: true, page_id};"
+      ]
+    },
+    "execute_javascript": {
+      "description": "Execute JavaScript in the page context",
+      "parameters": ["script", "page_id?=main"],
+      "code": [
+        "const {script, page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "const result = await page.evaluate(script);",
+        "return {success: true, result, page_id};"
+      ]
+    },
+    "get_page_title": {
+      "description": "Get the page title",
+      "parameters": ["page_id?=main"],
+      "code": [
+        "const {page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "const title = await page.title();",
+        "return {title, page_id};"
+      ]
+    },
+    "get_page_url": {
+      "description": "Get the current page URL",
+      "parameters": ["page_id?=main"],
+      "code": [
+        "const {page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "const url = page.url();",
+        "return {url, page_id};"
+      ]
+    },
+    "screenshot_page": {
+      "description": "Take screenshot of the page",
+      "parameters": ["page_id?=main", "full_page?=true", "path?"],
+      "code": [
+        "const {page_id = 'main', full_page = true, path} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "const options = { fullPage: full_page };",
+        "if (path) {",
+        "  options.path = path;",
+        "} else {",
+        "  options.encoding = 'base64';",
+        "}",
+        "const screenshot = await page.screenshot(options);",
+        "return {",
+        "  success: true,",
+        "  image: path ? null : screenshot,",
+        "  path: path || null,",
+        "  page_id",
+        "};"
+      ]
+    },
+    "screenshot_element": {
+      "description": "Take screenshot of a specific element",
+      "parameters": ["selector", "page_id?=main", "path?"],
+      "code": [
+        "const {selector, page_id = 'main', path} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "const element = await page.locator(selector);",
+        "const options = {};",
+        "if (path) {",
+        "  options.path = path;",
+        "} else {",
+        "  options.encoding = 'base64';",
+        "}",
+        "const screenshot = await element.screenshot(options);",
+        "return {",
+        "  success: true,",
+        "  image: path ? null : screenshot,",
+        "  path: path || null,",
+        "  selector,",
+        "  page_id",
+        "};"
+      ]
+    },
+    "select_option": {
+      "description": "Select option from dropdown",
+      "parameters": ["selector", "value", "page_id?=main"],
+      "code": [
+        "const {selector, value, page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "await page.selectOption(selector, value);",
+        "return {success: true, selector, value, page_id};"
+      ]
+    },
+    "check_checkbox": {
+      "description": "Check or uncheck a checkbox",
+      "parameters": ["selector", "checked?=true", "page_id?=main"],
+      "code": [
+        "const {selector, checked = true, page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "if (checked) {",
+        "  await page.check(selector);",
+        "} else {",
+        "  await page.uncheck(selector);",
+        "}",
+        "return {success: true, selector, checked, page_id};"
+      ]
+    },
+    "hover_element": {
+      "description": "Hover over an element",
+      "parameters": ["selector", "page_id?=main"],
+      "code": [
+        "const {selector, page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "await page.hover(selector);",
+        "return {success: true, selector, page_id};"
+      ]
+    },
+    "press_key": {
+      "description": "Press a key or key combination",
+      "parameters": ["key", "page_id?=main"],
+      "code": [
+        "const {key, page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "await page.keyboard.press(key);",
+        "return {success: true, key, page_id};"
+      ]
+    },
+    "close_page": {
+      "description": "Close a page",
+      "parameters": ["page_id?=main"],
+      "code": [
+        "const {page_id = 'main'} = params;",
+        "const page = global.pages.get(page_id);",
+        "if (!page) {",
+        "  return {success: false, error: `Page ${page_id} not found`};",
+        "}",
+        "await page.close();",
+        "global.pages.delete(page_id);",
+        "return {success: true, page_id};"
+      ]
+    },
+    "close_browser": {
+      "description": "Close a browser instance",
+      "parameters": ["browser_id?=default"],
+      "code": [
+        "const {browser_id = 'default'} = params;",
+        "const browser = global.browsers.get(browser_id);",
+        "if (!browser) {",
+        "  return {success: false, error: `Browser ${browser_id} not found`};",
+        "}",
+        "await browser.close();",
+        "global.browsers.delete(browser_id);",
+        "return {success: true, browser_id};"
+      ]
+    }
+  }
+}

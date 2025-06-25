@@ -1,0 +1,143 @@
+{
+  "package": "pyautogui",
+  "import_type": "python",
+  "description": "Cross-platform desktop automation with Python",
+  "capabilities": ["mouse_control", "keyboard_control", "screenshot"],
+  "setup": [
+    "import pyautogui",
+    "pyautogui.FAILSAFE = True",
+    "pyautogui.PAUSE = 0.1"
+  ],
+  "methods": {
+    "click_at": {
+      "description": "Click at specific screen coordinates",
+      "parameters": ["x", "y", "button?=left"],
+      "code": [
+        "x, y = params.get('x'), params.get('y')",
+        "button = params.get('button', 'left')",
+        "pyautogui.click(x, y, button=button)",
+        "result = {'success': True, 'message': f'{button} clicked at ({x}, {y})'}",
+        "return result"
+      ]
+    },
+    "double_click_at": {
+      "description": "Double click at specific coordinates",
+      "parameters": ["x", "y"],
+      "code": [
+        "x, y = params.get('x'), params.get('y')",
+        "pyautogui.doubleClick(x, y)",
+        "result = {'success': True, 'message': f'Double clicked at ({x}, {y})'}",
+        "return result"
+      ]
+    },
+    "type_text": {
+      "description": "Type text with optional interval",
+      "parameters": ["text", "interval?=0.0"],
+      "code": [
+        "text = params.get('text')",
+        "interval = params.get('interval', 0.0)",
+        "pyautogui.write(text, interval=interval)",
+        "result = {'success': True, 'message': f'Typed: {text}'}",
+        "return result"
+      ]
+    },
+    "key_combination": {
+      "description": "Execute keyboard shortcuts",
+      "parameters": ["keys"],
+      "code": [
+        "keys = params.get('keys', [])",
+        "if len(keys) == 1:",
+        "    pyautogui.press(keys[0])",
+        "else:",
+        "    pyautogui.hotkey(*keys)",
+        "result = {'success': True, 'keys': keys}",
+        "return result"
+      ]
+    },
+    "get_mouse_position": {
+      "description": "Get current mouse coordinates", 
+      "parameters": [],
+      "code": [
+        "pos = pyautogui.position()",
+        "result = {'x': pos.x, 'y': pos.y}",
+        "return result"
+      ]
+    },
+    "move_mouse_to": {
+      "description": "Move mouse to coordinates",
+      "parameters": ["x", "y", "duration?=0.0"],
+      "code": [
+        "x, y = params.get('x'), params.get('y')",
+        "duration = params.get('duration', 0.0)",
+        "pyautogui.moveTo(x, y, duration=duration)",
+        "result = {'success': True, 'x': x, 'y': y}",
+        "return result"
+      ]
+    },
+    "drag_and_drop": {
+      "description": "Drag from start to end coordinates",
+      "parameters": ["start_x", "start_y", "end_x", "end_y", "duration?=0.0"],
+      "code": [
+        "start_x = params.get('start_x')",
+        "start_y = params.get('start_y')",
+        "end_x = params.get('end_x')",
+        "end_y = params.get('end_y')",
+        "duration = params.get('duration', 0.0)",
+        "pyautogui.moveTo(start_x, start_y)",
+        "pyautogui.dragTo(end_x, end_y, duration=duration, button='left')",
+        "result = {'success': True, 'from': [start_x, start_y], 'to': [end_x, end_y]}",
+        "return result"
+      ]
+    },
+    "scroll": {
+      "description": "Scroll at current or specified position",
+      "parameters": ["clicks?=3", "x?", "y?"],
+      "code": [
+        "clicks = params.get('clicks', 3)",
+        "x = params.get('x')",
+        "y = params.get('y')",
+        "if x is not None and y is not None:",
+        "    pyautogui.scroll(clicks, x=x, y=y)",
+        "else:",
+        "    pyautogui.scroll(clicks)",
+        "result = {'success': True, 'clicks': clicks}",
+        "return result"
+      ]
+    },
+    "take_screenshot": {
+      "description": "Capture screen or region",
+      "parameters": ["x?", "y?", "width?", "height?"],
+      "code": [
+        "import base64",
+        "from io import BytesIO",
+        "x = params.get('x')",
+        "y = params.get('y')",
+        "width = params.get('width')",
+        "height = params.get('height')",
+        "if all(v is not None for v in [x, y, width, height]):",
+        "    screenshot = pyautogui.screenshot(region=(x, y, width, height))",
+        "else:",
+        "    screenshot = pyautogui.screenshot()",
+        "buffer = BytesIO()",
+        "screenshot.save(buffer, format='PNG')",
+        "image_data = base64.b64encode(buffer.getvalue()).decode()",
+        "result = {",
+        "    'image': image_data,",
+        "    'width': screenshot.width,",
+        "    'height': screenshot.height,",
+        "    'format': 'png'",
+        "}",
+        "return result"
+      ]
+    },
+    "get_screen_size": {
+      "description": "Get screen dimensions",
+      "parameters": [],
+      "code": [
+        "size = pyautogui.size()",
+        "result = {'width': size.width, 'height': size.height}",
+        "return result"
+      ]
+    }
+  }
+}

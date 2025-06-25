@@ -1,0 +1,130 @@
+{
+  "package": "fs-extra",
+  "import_name": "fs", 
+  "description": "Enhanced file system operations",
+  "capabilities": ["file_system"],
+  "methods": {
+    "list_directory": {
+      "description": "List files and folders in directory",
+      "parameters": ["path", "include_stats?=false"],
+      "code": [
+        "const {path, include_stats = false} = params;",
+        "const items = await fs.readdir(path, {withFileTypes: true});",
+        "const result = [];",
+        "for (const item of items) {",
+        "  const info = {",
+        "    name: item.name,",
+        "    isDirectory: item.isDirectory(),",
+        "    isFile: item.isFile()",
+        "  };",
+        "  if (include_stats) {",
+        "    const stats = await fs.stat(`${path}/${item.name}`);",
+        "    info.size = stats.size;",
+        "    info.modified = stats.mtime;",
+        "    info.created = stats.ctime;",
+        "  }",
+        "  result.push(info);",
+        "}",
+        "return result;"
+      ]
+    },
+    "read_file": {
+      "description": "Read file contents",
+      "parameters": ["path", "encoding?=utf8"],
+      "code": [
+        "const {path, encoding = 'utf8'} = params;",
+        "const content = await fs.readFile(path, encoding);",
+        "return {path, content, encoding};"
+      ]
+    },
+    "write_file": {
+      "description": "Write content to file",
+      "parameters": ["path", "content", "encoding?=utf8"],
+      "code": [
+        "const {path, content, encoding = 'utf8'} = params;",
+        "await fs.writeFile(path, content, encoding);",
+        "return {success: true, path, size: content.length};"
+      ]
+    },
+    "create_directory": {
+      "description": "Create directory (and parents if needed)",
+      "parameters": ["path"],
+      "code": [
+        "const {path} = params;",
+        "await fs.ensureDir(path);",
+        "return {success: true, path};"
+      ]
+    },
+    "remove_file": {
+      "description": "Remove file or directory",
+      "parameters": ["path"],
+      "code": [
+        "const {path} = params;",
+        "await fs.remove(path);",
+        "return {success: true, path};"
+      ]
+    },
+    "move_file": {
+      "description": "Move/rename file or directory",
+      "parameters": ["source", "destination"],
+      "code": [
+        "const {source, destination} = params;",
+        "await fs.move(source, destination);",
+        "return {success: true, from: source, to: destination};"
+      ]
+    },
+    "copy_file": {
+      "description": "Copy file or directory",
+      "parameters": ["source", "destination", "overwrite?=false"],
+      "code": [
+        "const {source, destination, overwrite = false} = params;",
+        "await fs.copy(source, destination, {overwrite});",
+        "return {success: true, from: source, to: destination};"
+      ]
+    },
+    "file_exists": {
+      "description": "Check if file or directory exists",
+      "parameters": ["path"],
+      "code": [
+        "const {path} = params;",
+        "const exists = await fs.pathExists(path);",
+        "return {path, exists};"
+      ]
+    },
+    "get_file_stats": {
+      "description": "Get detailed file information",
+      "parameters": ["path"],
+      "code": [
+        "const {path} = params;",
+        "const stats = await fs.stat(path);",
+        "return {",
+        "  path,",
+        "  size: stats.size,",
+        "  isFile: stats.isFile(),",
+        "  isDirectory: stats.isDirectory(),",
+        "  modified: stats.mtime,",
+        "  created: stats.ctime,",
+        "  accessed: stats.atime",
+        "};"
+      ]
+    },
+    "read_json": {
+      "description": "Read and parse JSON file",
+      "parameters": ["path"],
+      "code": [
+        "const {path} = params;",
+        "const data = await fs.readJson(path);",
+        "return {path, data};"
+      ]
+    },
+    "write_json": {
+      "description": "Write object as JSON file",
+      "parameters": ["path", "data", "spaces?=2"],
+      "code": [
+        "const {path, data, spaces = 2} = params;",
+        "await fs.writeJson(path, data, {spaces});",
+        "return {success: true, path};"
+      ]
+    }
+  }
+}

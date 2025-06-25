@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "desktop-mcp": {
+      "command": "python",
+      "args": ["-m", "desktop_mcp.server"],
+      "cwd": "C:\\Users\\marks\\Documents\\Source\\Personal\\claude-os",
+      "env": {
+        "PYTHONPATH": "C:\\Users\\marks\\Documents\\Source\\Personal\\claude-os"
+      }
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "package": "robotjs",
+  "import_name": "robot",
+  "description": "Desktop automation with mouse and keyboard control",
+  "capabilities": ["mouse_control", "keyboard_control", "screenshot"],
+  "setup": [
+    "// Set some defaults",
+    "robot.setMouseDelay(2);"
+  ],
+  "methods": {
+    "click_at": {
+      "description": "Click at specific screen coordinates",
+      "parameters": ["x", "y", "button?=left"],
+      "code": [
+        "const {x, y, button = 'left'} = params;",
+        "robot.moveMouse(x, y);",
+        "robot.mouseClick(button);",
+        "return {success: true, message: `${button} clicked at (${x}, ${y})`};"
+      ]
+    },
+    "double_click_at": {
+      "description": "Double click at specific coordinates", 
+      "parameters": ["x", "y"],
+      "code": [
+        "const {x, y} = params;",
+        "robot.moveMouse(x, y);",
+        "robot.mouseClick('left', true);",
+        "return {success: true, message: `Double clicked at (${x}, ${y})`};"
+      ]
+    },
+    "type_text": {
+      "description": "Type text with optional delay",
+      "parameters": ["text", "delay?=0"],
+      "code": [
+        "const {text, delay = 0} = params;",
+        "if (delay > 0) robot.setKeyboardDelay(delay);",
+        "robot.typeString(text);",
+        "return {success: true, message: `Typed: ${text}`};"
+      ]
+    },
+    "key_combination": {
+      "description": "Execute keyboard shortcuts",
+      "parameters": ["keys"],
+      "code": [
+        "const {keys} = params;",
+        "if (keys.length === 1) {",
+        "  robot.keyTap(keys[0]);",
+        "} else {",
+        "  const modifiers = keys.slice(0, -1);",
+        "  const key = keys[keys.length - 1];",
+        "  robot.keyTap(key, modifiers);",
+        "}",
+        "return {success: true, keys};"
+      ]
+    },
+    "get_mouse_position": {
+      "description": "Get current mouse coordinates",
+      "parameters": [],
+      "code": [
+        "const pos = robot.getMousePos();",
+        "return {x: pos.x, y: pos.y};"
+      ]
+    },
+    "move_mouse_to": {
+      "description": "Move mouse to coordinates",
+      "parameters": ["x", "y", "smooth?=false"],
+      "code": [
+        "const {x, y, smooth = false} = params;",
+        "if (smooth) {",
+        "  robot.moveMouseSmooth(x, y);",
+        "} else {",
+        "  robot.moveMouse(x, y);",
+        "}",
+        "return {success: true, x, y};"
+      ]
+    },
+    "drag_and_drop": {
+      "description": "Drag from start to end coordinates",
+      "parameters": ["start_x", "start_y", "end_x", "end_y"],
+      "code": [
+        "const {start_x, start_y, end_x, end_y} = params;",
+        "robot.moveMouse(start_x, start_y);",
+        "robot.mouseToggle('down');",
+        "robot.dragMouse(end_x, end_y);",
+        "robot.mouseToggle('up');",
+        "return {success: true, from: [start_x, start_y], to: [end_x, end_y]};"
+      ]
+    },
+    "scroll": {
+      "description": "Scroll at current or specified position",
+      "parameters": ["direction?=down", "clicks?=3", "x?", "y?"],
+      "code": [
+        "const {direction = 'down', clicks = 3, x, y} = params;",
+        "if (x !== undefined && y !== undefined) {",
+        "  robot.moveMouse(x, y);",
+        "}",
+        "robot.scrollMouse(clicks, direction);",
+        "return {success: true, direction, clicks};"
+      ]
+    },
+    "take_screenshot": {
+      "description": "Capture screen or region",
+      "parameters": ["x?", "y?", "width?", "height?"],
+      "code": [
+        "const {x, y, width, height} = params;",
+        "let screenshot;",
+        "if (x !== undefined && y !== undefined && width && height) {",
+        "  screenshot = robot.screen.capture(x, y, width, height);",
+        "} else {",
+        "  screenshot = robot.screen.capture();",
+        "}",
+        "return {",
+        "  image: screenshot.image.toString('base64'),",
+        "  width: screenshot.width,",
+        "  height: screenshot.height,",
+        "  format: 'png'",
+        "};"
+      ]
+    }
+  }
+}

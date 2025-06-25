@@ -1,0 +1,1 @@
+"""Core desktop MCP functionality."""

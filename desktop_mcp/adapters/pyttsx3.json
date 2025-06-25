@@ -1,0 +1,143 @@
+{
+  "package": "pyttsx3",
+  "import_type": "python",
+  "description": "Text-to-speech and voice synthesis",
+  "capabilities": ["audio", "voice_synthesis", "accessibility"],
+  "setup": [
+    "import pyttsx3",
+    "global tts_engine",
+    "tts_engine = pyttsx3.init()"
+  ],
+  "cleanup": [
+    "if 'tts_engine' in globals():",
+    "    tts_engine.stop()"
+  ],
+  "methods": {
+    "speak_text": {
+      "description": "Convert text to speech and play it",
+      "parameters": ["text", "rate?=200", "volume?=0.8"],
+      "code": [
+        "text = params.get('text')",
+        "rate = params.get('rate', 200)",
+        "volume = params.get('volume', 0.8)",
+        "try:",
+        "    tts_engine.setProperty('rate', rate)",
+        "    tts_engine.setProperty('volume', volume)",
+        "    tts_engine.say(text)",
+        "    tts_engine.runAndWait()",
+        "    result = {",
+        "        'success': True,",
+        "        'text': text,",
+        "        'rate': rate,",
+        "        'volume': volume,",
+        "        'message': 'Text spoken successfully'",
+        "    }",
+        "except Exception as e:",
+        "    result = {'success': False, 'error': str(e), 'text': text}",
+        "return result"
+      ]
+    },
+    "get_voices": {
+      "description": "Get available TTS voices",
+      "parameters": [],
+      "code": [
+        "try:",
+        "    voices = tts_engine.getProperty('voices')",
+        "    voice_list = []",
+        "    for i, voice in enumerate(voices):",
+        "        voice_list.append({",
+        "            'id': i,",
+        "            'name': voice.name,",
+        "            'language': getattr(voice, 'languages', ['unknown'])[0] if hasattr(voice, 'languages') else 'unknown',",
+        "            'gender': getattr(voice, 'gender', 'unknown')",
+        "        })",
+        "    result = {",
+        "        'success': True,",
+        "        'voices': voice_list,",
+        "        'count': len(voice_list)",
+        "    }",
+        "except Exception as e:",
+        "    result = {'success': False, 'error': str(e)}",
+        "return result"
+      ]
+    },
+    "set_voice": {
+      "description": "Set the TTS voice",
+      "parameters": ["voice_id"],
+      "code": [
+        "voice_id = params.get('voice_id')",
+        "try:",
+        "    voices = tts_engine.getProperty('voices')",
+        "    if 0 <= voice_id < len(voices):",
+        "        tts_engine.setProperty('voice', voices[voice_id].id)",
+        "        result = {",
+        "            'success': True,",
+        "            'voice_id': voice_id,",
+        "            'voice_name': voices[voice_id].name",
+        "        }",
+        "    else:",
+        "        result = {",
+        "            'success': False,",
+        "            'error': f'Invalid voice_id: {voice_id}. Available: 0-{len(voices)-1}'",
+        "        }",
+        "except Exception as e:",
+        "    result = {'success': False, 'error': str(e)}",
+        "return result"
+      ]
+    },
+    "save_speech_to_file": {
+      "description": "Save text-to-speech as audio file",
+      "parameters": ["text", "filename", "rate?=200"],
+      "code": [
+        "text = params.get('text')",
+        "filename = params.get('filename')",
+        "rate = params.get('rate', 200)",
+        "try:",
+        "    tts_engine.setProperty('rate', rate)",
+        "    tts_engine.save_to_file(text, filename)",
+        "    tts_engine.runAndWait()",
+        "    result = {",
+        "        'success': True,",
+        "        'text': text,",
+        "        'filename': filename,",
+        "        'message': 'Speech saved to file successfully'",
+        "    }",
+        "except Exception as e:",
+        "    result = {'success': False, 'error': str(e), 'filename': filename}",
+        "return result"
+      ]
+    },
+    "announce": {
+      "description": "Make an announcement with emphasis",
+      "parameters": ["message", "urgency?=normal"],
+      "code": [
+        "message = params.get('message')",
+        "urgency = params.get('urgency', 'normal')",
+        "try:",
+        "    if urgency == 'high':",
+        "        tts_engine.setProperty('rate', 250)",
+        "        tts_engine.setProperty('volume', 1.0)",
+        "        announcement = f'ATTENTION! {message}'",
+        "    elif urgency == 'low':",
+        "        tts_engine.setProperty('rate', 150)",
+        "        tts_engine.setProperty('volume', 0.6)",
+        "        announcement = f'Notice: {message}'",
+        "    else:",
+        "        tts_engine.setProperty('rate', 200)",
+        "        tts_engine.setProperty('volume', 0.8)",
+        "        announcement = message",
+        "    tts_engine.say(announcement)",
+        "    tts_engine.runAndWait()",
+        "    result = {",
+        "        'success': True,",
+        "        'message': message,",
+        "        'urgency': urgency,",
+        "        'announcement': announcement",
+        "    }",
+        "except Exception as e:",
+        "    result = {'success': False, 'error': str(e)}",
+        "return result"
+      ]
+    }
+  }
+}

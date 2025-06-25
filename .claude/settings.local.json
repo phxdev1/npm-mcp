@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm init:*)",
+      "Bash(python test_desktop_control.py:*)",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(rm:*)",
+      "Bash(timeout:*)",
+      "mcp__desktop-mcp__speak_text",
+      "mcp__desktop-mcp__get_environment_variable"
+    ],
+    "deny": []
+  }
+}

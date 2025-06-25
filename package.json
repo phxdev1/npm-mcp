@@ -1,0 +1,36 @@
+{
+  "name": "desktop-mcp-example-plugin",
+  "version": "1.0.0",
+  "description": "Example NPM plugin for Desktop MCP demonstrating mouse control",
+  "main": "index.js",
+  "keywords": [
+    "mcp",
+    "desktop",
+    "automation",
+    "mouse"
+  ],
+  "author": "Desktop MCP Team",
+  "license": "MIT",
+  "mcp": {
+    "capabilities": [
+      "mouse_control",
+      "screenshot"
+    ],
+    "platforms": [
+      "windows",
+      "linux",
+      "darwin"
+    ],
+    "permissions": {
+      "can_control_input": true,
+      "can_take_screenshots": true,
+      "confirmation_required": false
+    }
+  },
+  "dependencies": {
+    "robotjs": "^0.6.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "package": "puppeteer", 
+  "import_name": "puppeteer",
+  "description": "Browser automation and web scraping",
+  "capabilities": ["web_automation"],
+  "setup": [
+    "// Global browser and page instances",
+    "global.browser = null;",
+    "global.page = null;"
+  ],
+  "cleanup": [
+    "if (global.browser) await global.browser.close();"
+  ],
+  "methods": {
+    "launch_browser": {
+      "description": "Launch browser instance",
+      "parameters": ["headless?=false", "width?=1280", "height?=720"],
+      "code": [
+        "const {headless = false, width = 1280, height = 720} = params;",
+        "if (global.browser) {",
+        "  await global.browser.close();",
+        "}",
+        "global.browser = await puppeteer.launch({",
+        "  headless,",
+        "  defaultViewport: {width, height}",
+        "});",
+        "return {success: true, headless, viewport: {width, height}};"
+      ]
+    },
+    "new_page": {
+      "description": "Create new browser page/tab",
+      "parameters": [],
+      "code": [
+        "if (!global.browser) {",
+        "  throw new Error('Browser not launched. Call launch_browser first.');",
+        "}",
+        "global.page = await global.browser.newPage();",
+        "return {success: true, message: 'New page created'};"
+      ]
+    },
+    "navigate_to": {
+      "description": "Navigate to URL",
+      "parameters": ["url", "wait_until?=networkidle2"],
+      "code": [
+        "const {url, wait_until = 'networkidle2'} = params;",
+        "if (!global.page) {",
+        "  global.page = await global.browser.newPage();",
+        "}",
+        "await global.page.goto(url, {waitUntil: wait_until});",
+        "const title = await global.page.title();",
+        "return {success: true, url, title};"
+      ]
+    },
+    "click_element": {
+      "description": "Click element by selector",
+      "parameters": ["selector", "wait_timeout?=5000"],
+      "code": [
+        "const {selector, wait_timeout = 5000} = params;",
+        "await global.page.waitForSelector(selector, {timeout: wait_timeout});",
+        "await global.page.click(selector);",
+        "return {success: true, selector};"
+      ]
+    },
+    "type_in_element": {
+      "description": "Type text in element",
+      "parameters": ["selector", "text", "clear?=true"],
+      "code": [
+        "const {selector, text, clear = true} = params;",
+        "await global.page.waitForSelector(selector);",
+        "if (clear) {",
+        "  await global.page.click(selector, {clickCount: 3});",
+        "}",
+        "await global.page.type(selector, text);",
+        "return {success: true, selector, text};"
+      ]
+    },
+    "get_text": {
+      "description": "Get text content of element",
+      "parameters": ["selector"],
+      "code": [
+        "const {selector} = params;",
+        "const text = await global.page.$eval(selector, el => el.textContent);",
+        "return {selector, text};"
+      ]
+    },
+    "get_page_title": {
+      "description": "Get current page title",
+      "parameters": [],
+      "code": [
+        "const title = await global.page.title();",
+        "return {title};"
+      ]
+    },
+    "get_page_url": {
+      "description": "Get current page URL",
+      "parameters": [],
+      "code": [
+        "const url = global.page.url();",
+        "return {url};"
+      ]
+    },
+    "screenshot_page": {
+      "description": "Take screenshot of page",
+      "parameters": ["full_page?=true", "selector?"],
+      "code": [
+        "const {full_page = true, selector} = params;",
+        "let screenshot;",
+        "if (selector) {",
+        "  const element = await global.page.$(selector);",
+        "  screenshot = await element.screenshot({encoding: 'base64'});",
+        "} else {",
+        "  screenshot = await global.page.screenshot({",
+        "    encoding: 'base64',",
+        "    fullPage: full_page",
+        "  });",
+        "}",
+        "return {image: screenshot, format: 'png'};"
+      ]
+    },
+    "wait_for_element": {
+      "description": "Wait for element to appear",
+      "parameters": ["selector", "timeout?=5000"],
+      "code": [
+        "const {selector, timeout = 5000} = params;",
+        "await global.page.waitForSelector(selector, {timeout});",
+        "return {success: true, selector};"
+      ]
+    },
+    "evaluate_script": {
+      "description": "Execute JavaScript in page context",
+      "parameters": ["script"],
+      "code": [
+        "const {script} = params;",
+        "const result = await global.page.evaluate(script);",
+        "return {result};"
+      ]
+    }
+  }
+}
