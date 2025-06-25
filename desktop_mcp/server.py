@@ -62,8 +62,11 @@ class DesktopMCPServer:
         """Register a single function as an MCP tool."""
         try:
             # Create tool schema (simplified for auto-discovery)
+            # Use MCP naming convention that Claude expects
+            mcp_tool_name = f"mcp__desktop-mcp__{func_name}"
+            
             tool = Tool(
-                name=func_name,
+                name=mcp_tool_name,
                 description=getattr(func, '__doc__', f"Function from {plugin.metadata.name} plugin"),
                 inputSchema={
                     "type": "object",
@@ -72,7 +75,7 @@ class DesktopMCPServer:
                 }
             )
             
-            self.tools[func_name] = tool
+            self.tools[mcp_tool_name] = tool
             logger.info(f"Registered MCP tool: {func_name}")
                         
         except Exception as e:
@@ -89,13 +92,18 @@ class DesktopMCPServer:
         @self.server.call_tool()
         async def call_tool(name: str, arguments: Dict[str, Any]) -> list[TextContent]:
             """Call a tool by name."""
+            # Strip MCP prefix to get actual function name
+            actual_func_name = name
+            if name.startswith("mcp__desktop-mcp__"):
+                actual_func_name = name.replace("mcp__desktop-mcp__", "")
+            
             # Find the plugin and function for this tool
             for plugin_name, plugin in self.registry.loaded_plugins.items():
                 try:
                     if hasattr(plugin, 'get_mcp_functions'):
                         functions = plugin.get_mcp_functions()
-                        if name in functions:
-                            func = functions[name]
+                        if actual_func_name in functions:
+                            func = functions[actual_func_name]
                             result = await func(**arguments)
                             return [TextContent(
                                 type="text",
