@@ -9,7 +9,9 @@
       "Bash(rm:*)",
       "Bash(timeout:*)",
       "mcp__desktop-mcp__speak_text",
-      "mcp__desktop-mcp__get_environment_variable"
+      "mcp__desktop-mcp__get_environment_variable",
+      "mcp__desktop-mcp__get_current_directory",
+      "mcp__desktop-mcp__run_command"
     ],
     "deny": []
   }
