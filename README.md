@@ -1,6 +1,6 @@
-# Desktop MCP Server
+# NPM MCP Server
 
-A Model Context Protocol (MCP) server that enables Claude to control desktop operating systems through natural language commands.
+A Model Context Protocol (MCP) server that enables Claude to control desktop operating systems through natural language commands using existing NPM packages and Python libraries.
 
 ## Quick Start
 
@@ -21,6 +21,23 @@ A Model Context Protocol (MCP) server that enables Claude to control desktop ope
    python -m desktop_mcp.server
    ```
 
+## Zero-Configuration Plugin System
+
+NPM MCP automatically discovers and adapts existing NPM packages and Python libraries:
+
+```bash
+# Want mouse control? Just install robotjs:
+npm install -g robotjs
+
+# Want browser automation? Just install puppeteer:
+npm install -g puppeteer
+
+# Want enhanced file operations? Just install fs-extra:
+npm install -g fs-extra
+
+# Everything works immediately - existing packages are auto-adapted!
+```
+
 ## Features
 
 - **Mouse & Keyboard Control**: Click, type, drag, scroll, keyboard shortcuts
@@ -32,9 +49,16 @@ A Model Context Protocol (MCP) server that enables Claude to control desktop ope
 - **Database Operations**: SQLite database management
 - **Task Scheduling**: Schedule and manage automated tasks
 
-## Configuration
+## How It Works
 
-The server auto-discovers and loads all available adapters from the `desktop_mcp/adapters/` directory. Each adapter is a JSON file that defines how to interface with different tools and libraries.
+NPM MCP uses a unique adapter system that automatically converts existing NPM packages and Python libraries into MCP tools:
+
+1. **Auto-Discovery**: Scans for installed packages and available adapters
+2. **JSON Adapters**: Uses declarative JSON files to map package functions to MCP tools
+3. **Zero Config**: No setup required - just install packages and they work immediately
+4. **Cross-Platform**: Supports both NPM packages (Node.js) and Python libraries
+
+The server loads all available adapters from the `desktop_mcp/adapters/` directory. Each adapter is a JSON file that defines how to interface with different tools and libraries.
 
 ## Architecture
 
