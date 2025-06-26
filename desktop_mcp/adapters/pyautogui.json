@@ -115,19 +115,13 @@
         "width = params.get('width')",
         "height = params.get('height')",
         "if all(v is not None for v in [x, y, width, height]):",
-        "    screenshot = pyautogui.screenshot(region=(x, y, width, height))",
+        "    screenshot = pyautogui.screenshot(region=(int(x), int(y), int(width), int(height)))",
         "else:",
         "    screenshot = pyautogui.screenshot()",
         "buffer = BytesIO()",
         "screenshot.save(buffer, format='PNG')",
         "image_data = base64.b64encode(buffer.getvalue()).decode()",
-        "result = {",
-        "    'image': image_data,",
-        "    'width': screenshot.width,",
-        "    'height': screenshot.height,",
-        "    'format': 'png'",
-        "}",
-        "return result"
+        "return f'data:image/png;base64,{image_data}'"
       ]
     },
     "get_screen_size": {

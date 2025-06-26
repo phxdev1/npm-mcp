@@ -109,12 +109,7 @@
         "} else {",
         "  screenshot = robot.screen.capture();",
         "}",
-        "return {",
-        "  image: screenshot.image.toString('base64'),",
-        "  width: screenshot.width,",
-        "  height: screenshot.height,",
-        "  format: 'png'",
-        "};"
+        "return `data:image/png;base64,${screenshot.image.toString('base64')}`;"
       ]
     }
   }
