@@ -10,7 +10,7 @@
     "import io",
     "AUDIO_PLAYBACK = False",
     "try: from dotenv import load_dotenv; load_dotenv()\nexcept: pass",
-    "try: import pygame; pygame.mixer.init(); AUDIO_PLAYBACK = True\nexcept: pass",
+    "try: import pygame; pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=512); pygame.mixer.init(); AUDIO_PLAYBACK = True\nexcept: pass",
     "ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY')",
     "ELEVENLABS_BASE_URL = 'https://api.elevenlabs.io/v1'"
   ],
